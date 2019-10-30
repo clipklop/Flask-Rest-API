@@ -1,7 +1,7 @@
-#
+# Course resource for APi
 
 from flask_restful import Resources
-from flask import Flask
+from flask import jsonify
 
 import models
 
@@ -12,4 +12,11 @@ class CourseList(Resources):
 
 
 class Course(Resources):
-    return
+    def get(self, id):
+        return jsonify({'title': 'Python Basics'})
+
+    def put(self, id):
+        return jsonify({'title': 'Python Basics'})
+
+    def delete(self, id):
+        return jsonify({'title': 'Python Basics'})
