@@ -1,12 +1,11 @@
 # Course resource for APi
 
 from flask_restful import (
-    Resource, Api, reqparse, inputs, fields, marshal, marshal_with, abort
+    Resource, Api, reqparse, inputs, fields, marshal, marshal_with, abort,
 )
 from flask import Blueprint, jsonify, url_for
 
 import models
-
 
 course_fields = {
     'id': fields.Integer,
@@ -17,6 +16,7 @@ course_fields = {
 
 
 def add_reviews(course):
+    """Adding reviews for each course."""
     course.reviews = [
         url_for('resources.reviews.review', id=review.id)
         for review in course.review_set
@@ -25,8 +25,9 @@ def add_reviews(course):
 
 
 def course_or_404(course_id):
+    """If course is not find - throw an excpetion."""
     try:
-        course = models.Course.get(models.Course.id==course_id)
+        course = models.Course.get(models.Course.id == course_id)
     except models.Course.DoesNotExist:
         abort(404, message="Course {} doesn't exit.".format(course_id))
     else:
@@ -58,11 +59,13 @@ class CourseList(Resource):
         ]
         return {'courses': courses}
 
+    @marshal_with(course_fields)
     def post(self):
         # necessary for checking provided attributes
         args = self.reqparse.parse_args()
-        models.Course.create(**args)
-        return jsonify({'courses': [{'title': 'Python Basics'}]})        
+        course = models.Course.create(**args)
+        return (add_reviews(course), 201, {
+            'Location': url_for('resources.courses.course', id=course.id)})
 
 
 class Course(Resource):
@@ -85,13 +88,22 @@ class Course(Resource):
 
     @marshal_with(course_fields)
     def get(self, id):
+        """Returns single review and maps it according to :course_fields:"."""
         return add_reviews(course_or_404(id))
 
+    @marshal_with(course_fields)
     def put(self, id):
-        return jsonify({'title': 'Python Basics'})
+        args = self.reqparse.parse_args()
+        query = models.Course.update(**args).where(models.Course.id == id)
+        query.execute()
+        return (add_reviews(models.Course.get(models.Course.id == id)), 200, {
+            'Location': url_for('resources.courses.course', id=id)})
 
     def delete(self, id):
-        return jsonify({'title': 'Python Basics'})
+        query = models.Course.delete().where(models.Course.id == id)
+        query.execute()
+        return ('', 204, {
+            'Location': url_for('resources.courses.courses')})
 
 
 courses_api = Blueprint('resources.courses', __name__)

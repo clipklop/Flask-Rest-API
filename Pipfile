@@ -9,6 +9,7 @@ verify_ssl = true
 flask-restful = "*"
 peewee = "*"
 flask = "*"
+argon2-cffi = "*"
 
 [requires]
 python_version = "3.7"
