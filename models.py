@@ -4,6 +4,7 @@
     *
 """
 
+from argon2 import PasswordHasher
 import peewee as pw
 import datetime
 
@@ -27,7 +28,7 @@ class User(pw.Model):
         email = email.lower()
         try:
             cls.select().where(
-                (cls.email == email) | (cls.username**username)
+                (cls.email == email) | (cls.username**username) # ** is like operator, doesn't need for SQLite
             ).get()
         except cls.DoesNotExist():
             user = cls(username=username, email=email)
@@ -39,7 +40,7 @@ class User(pw.Model):
 
     @staticmethod
     def set_password(password):
-        return HASHER.hast(password)
+        return HASHER.hash(password)
     
     def verify_password(self, password):
         return HASHER.verify(self.password, password)
@@ -59,6 +60,7 @@ class Review(pw.Model):
     rating = pw.IntegerField()
     comment = pw.TextField(default='')
     created_at = pw.DateTimeField(default=datetime.datetime.now)
+    created_by = pw.ForeignKeyField(User, backref='review_set')
 
     class Meta:
         database = DB
@@ -66,5 +68,5 @@ class Review(pw.Model):
 
 def initialize():
     DB.connect()
-    DB.create_tables([Course, Review], safe=True)
+    DB.create_tables([User, Course, Review], safe=True)
     DB.close()
