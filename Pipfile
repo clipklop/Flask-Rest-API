@@ -10,6 +10,7 @@ flask-restful = "*"
 peewee = "*"
 flask = "*"
 argon2-cffi = "*"
+flask-httpauth = "*"
 
 [requires]
 python_version = "3.7"
