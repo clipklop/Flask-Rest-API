@@ -1,9 +1,9 @@
 # Review resource for APi
 
 from flask_restful import (
-    Resource, Api, reqparse, inputs, fields, marshal, marshal_with, abort, g
+    Resource, Api, reqparse, inputs, fields, marshal, marshal_with, abort
 )
-from flask import Blueprint, jsonify, url_for, make_response
+from flask import Blueprint, jsonify, url_for, make_response, g
 
 from auth import auth
 import models

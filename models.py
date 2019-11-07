@@ -30,7 +30,7 @@ class User(pw.Model):
             cls.select().where(
                 (cls.email == email) | (cls.username**username) # ** is like operator, doesn't need for SQLite
             ).get()
-        except cls.DoesNotExist():
+        except cls.DoesNotExist:
             user = cls(username=username, email=email)
             user.password = user.set_password(password)
             user.save()
